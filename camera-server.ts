@@ -8,7 +8,7 @@ import cors from 'cors';
 import categoryRoutes from './routes/category-routes'; // Import the routes
 
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3001;
 
 // Path to SSL certificates
 // const certPath = "/etc/letsencrypt/live/rexlee.space/";
