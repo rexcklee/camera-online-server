@@ -1,14 +1,15 @@
-import 'dotenv/config'; // Import dotenv configuration
+import 'dotenv/config';
 import https from 'https';
 import fs from 'fs';
 import path from 'path';
 import express from 'express';
 import cors from 'cors';
 
-import categoryRoutes from './routes/category-routes'; // Import the routes
+import categoryRoutes from './routes/category-routes';
+import userRoutes from './routes/user-routes';
 
 const app = express();
-const port = process.env.PORT || 3001;
+//const port = process.env.PORT || 3001;
 
 // Path to SSL certificates
 const certPath = "/etc/letsencrypt/live/rexlee.space/";
@@ -26,6 +27,7 @@ app.use(express.json());
 
 // Mounting routes
 app.use("/category", categoryRoutes);
+app.use("/user", userRoutes);
 
 
 //Create an HTTPS server
