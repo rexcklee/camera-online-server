@@ -28,13 +28,45 @@ model Category {
   name        String        @db.VarChar(255)
   description String?
   sort        Int           @default(0)
-  SubCategory SubCategory[]
+  subCategory SubCategory[]
+  products    Product[]
 }
 
 model SubCategory {
-  id          Int      @id @default(autoincrement())
-  name        String   @db.VarChar(255)
+  id          Int       @id @default(autoincrement())
+  name        String    @db.VarChar(255)
   description String?
-  category    Category @relation(fields: [categoryId], references: [id])
+  sort        Int       @default(0)
+  category    Category  @relation(fields: [categoryId], references: [id])
   categoryId  Int
+  products    Product[]
+}
+
+model Product {
+  id            Int                @id @default(autoincrement())
+  name          String
+  description   String?
+  price         Float
+  category      Category?          @relation(fields: [categoryId], references: [id])
+  categoryId    Int?
+  subcategory   SubCategory?       @relation(fields: [subcategoryId], references: [id])
+  subcategoryId Int?
+  attributes    ProductAttribute[]
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+}
+
+model Attribute {
+  id       Int                @id @default(autoincrement())
+  name     String
+  products ProductAttribute[]
+}
+
+model ProductAttribute {
+  id          Int       @id @default(autoincrement())
+  product     Product   @relation(fields: [productId], references: [id])
+  productId   Int
+  attribute   Attribute @relation(fields: [attributeId], references: [id])
+  attributeId Int
+  value       String
 }

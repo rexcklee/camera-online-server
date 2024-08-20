@@ -1,0 +1,7 @@
+{
+    "watch": [
+        "routes"
+    ],
+    "ext": "ts,tsx",
+    "exec": "tsx"
+}
