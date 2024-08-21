@@ -10,24 +10,12 @@ const prisma = new PrismaClient();
 const router = Router(); // Initialize Express Router
 const jwtKey = process.env.JWT_KEY;
 
-// Get All sub-categories
+// Get All Products
 router.get("/get_all/", async (req: Request, res: Response) => {
     try {
-        const allSubCategories = await prisma.subCategory.findMany({
-            orderBy: [
-                {
-                    categoryId: 'asc',
-                },
-                {
-                    sort: 'asc',
-                },
-            ],
-            include: {
-                category: true,
-            },
-        });
-        console.log(allSubCategories);
-        const successResponse = ApiResponse.success(allSubCategories);
+        const allProducts = await prisma.product.findMany();
+        console.log(allProducts);
+        const successResponse = ApiResponse.success(allProducts);
         res.json(successResponse);
     } catch (error) {
         console.error(error);
@@ -35,24 +23,26 @@ router.get("/get_all/", async (req: Request, res: Response) => {
     }
 });
 
-//Add product sub-category
+//Add Product
 router.post("/add/", checkToken, (req: CustomRequest, res: Response) => {
-    const { name, description, categoryId } = req.body;
+    const { name, description, price, categoryId, subcategoryId } = req.body;
     jwt.verify(req.token!, jwtKey!, async (err, authorizedData) => {
         if (err) {
             console.log("ERROR: Could not connect to the protected route");
             res.status(403).json({ message: "Forbidden: No token provided" });
         } else {
             try {
-                const newSubCategory = await prisma.subCategory.create({
+                const newProduct = await prisma.product.create({
                     data: {
                         name,
                         description,
+                        price: Number(price),
                         categoryId,
+                        subcategoryId,
                     },
                 });
-                console.log(newSubCategory);
-                const successResponse = ApiResponse.success(newSubCategory);
+                console.log(newProduct);
+                const successResponse = ApiResponse.success(newProduct);
                 res.json(successResponse);
             } catch (error) {
                 console.error(error);
@@ -62,26 +52,27 @@ router.post("/add/", checkToken, (req: CustomRequest, res: Response) => {
     });
 });
 
-// Update product category
+// Update Product
 router.post("/update/", checkToken, async (req: CustomRequest, res: Response) => {
-    const { id, name, description, categoryId, sort } = req.body;
+    const { id, name, description, price, categoryId, subcategoryId } = req.body;
     jwt.verify(req.token!, jwtKey!, async (err, authorizedData) => {
         if (err) {
             console.log("ERROR: Could not connect to the protected route");
             res.status(403).json({ message: "Forbidden: No token provided" });
         } else {
             try {
-                const updatedSubCategory = await prisma.subCategory.update({
+                const updatedProduct = await prisma.product.update({
                     where: { id: Number(id) },
                     data: {
                         name,
                         description,
-                        sort,
+                        price,
                         categoryId,
+                        subcategoryId
                     },
                 });
-                console.log(updatedSubCategory);
-                const successResponse = ApiResponse.success(updatedSubCategory);
+                console.log(updatedProduct);
+                const successResponse = ApiResponse.success(updatedProduct);
                 res.json(successResponse);
             } catch (error) {
                 console.error(error);
@@ -91,7 +82,7 @@ router.post("/update/", checkToken, async (req: CustomRequest, res: Response) =>
     });
 });
 
-// Delete product category
+// Delete Product
 router.post("/delete/", checkToken, (req: CustomRequest, res: Response) => {
     const { id } = req.body;
     jwt.verify(req.token!, jwtKey!, async (err, authorizedData) => {
@@ -100,13 +91,13 @@ router.post("/delete/", checkToken, (req: CustomRequest, res: Response) => {
             res.status(403).json({ message: "Forbidden: No token provided" });
         } else {
             try {
-                const deletedSubCategory = await prisma.subCategory.delete({
+                const deletedProduct = await prisma.product.delete({
                     where: {
                         id: Number(id),
                     },
                 });
-                console.log(deletedSubCategory);
-                const successResponse = ApiResponse.success(deletedSubCategory);
+                console.log(deletedProduct);
+                const successResponse = ApiResponse.success(deletedProduct);
                 res.json(successResponse);
             } catch (error) {
                 console.error(error);

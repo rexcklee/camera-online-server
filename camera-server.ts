@@ -8,6 +8,7 @@ import cors from 'cors';
 import categoryRoutes from './routes/category-routes';
 import userRoutes from './routes/user-routes';
 import subCategoryRoutes from './routes/subcategory-routes';
+import productRoutes from './routes/product-routes';
 
 const app = express();
 //const port = process.env.PORT || 3001;
@@ -29,6 +30,7 @@ app.use(express.json());
 // Mounting routes
 app.use("/category", categoryRoutes);
 app.use("/subcategory", subCategoryRoutes);
+app.use("/product", productRoutes);
 app.use("/user", userRoutes);
 
 
