@@ -10,12 +10,12 @@ const prisma = new PrismaClient();
 const router = Router(); // Initialize Express Router
 const jwtKey = process.env.JWT_KEY;
 
-// Get All Products
+// Get All attribute categories
 router.get("/get_all/", async (req: Request, res: Response) => {
     try {
-        const allProducts = await prisma.product.findMany();
-        console.log(allProducts);
-        const successResponse = ApiResponse.success(allProducts);
+        const allAttributes = await prisma.attribute.findMany();
+        console.log(allAttributes);
+        const successResponse = ApiResponse.success(allAttributes);
         res.json(successResponse);
     } catch (error) {
         console.error(error);
@@ -23,47 +23,22 @@ router.get("/get_all/", async (req: Request, res: Response) => {
     }
 });
 
-// Get All Products
-router.post("/get_byId/", async (req: Request, res: Response) => {
-    const { id } = req.body;
-    console.log(id);
-    try {
-        const product = await prisma.product.findUnique({
-            where: { id: Number(id) },
-        });
-
-        if (product) {
-            const successResponse = ApiResponse.success(product);
-            res.json(successResponse);
-        } else {
-            res.status(404).json({ error: 'Product not found' });
-        }
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Internal Server Error' });
-    }
-});
-
-//Add Product
+//Add attribute
 router.post("/add/", checkToken, (req: CustomRequest, res: Response) => {
-    const { name, description, price, categoryId, subcategoryId } = req.body;
+    const { name } = req.body;
     jwt.verify(req.token!, jwtKey!, async (err, authorizedData) => {
         if (err) {
             console.log("ERROR: Could not connect to the protected route");
             res.status(403).json({ message: "Forbidden: No token provided" });
         } else {
             try {
-                const newProduct = await prisma.product.create({
+                const newAttribute = await prisma.attribute.create({
                     data: {
                         name,
-                        description,
-                        price: Number(price),
-                        categoryId,
-                        subcategoryId,
                     },
                 });
-                console.log(newProduct);
-                const successResponse = ApiResponse.success(newProduct);
+                console.log(newAttribute);
+                const successResponse = ApiResponse.success(newAttribute);
                 res.json(successResponse);
             } catch (error) {
                 console.error(error);
@@ -73,27 +48,23 @@ router.post("/add/", checkToken, (req: CustomRequest, res: Response) => {
     });
 });
 
-// Update Product
+// Update attribute
 router.post("/update/", checkToken, async (req: CustomRequest, res: Response) => {
-    const { id, name, description, price, categoryId, subcategoryId } = req.body;
+    const { id, name } = req.body;
     jwt.verify(req.token!, jwtKey!, async (err, authorizedData) => {
         if (err) {
             console.log("ERROR: Could not connect to the protected route");
             res.status(403).json({ message: "Forbidden: No token provided" });
         } else {
             try {
-                const updatedProduct = await prisma.product.update({
+                const updatedAttribute = await prisma.attribute.update({
                     where: { id: Number(id) },
                     data: {
                         name,
-                        description,
-                        price,
-                        categoryId,
-                        subcategoryId
                     },
                 });
-                console.log(updatedProduct);
-                const successResponse = ApiResponse.success(updatedProduct);
+                console.log(updatedAttribute);
+                const successResponse = ApiResponse.success(updatedAttribute);
                 res.json(successResponse);
             } catch (error) {
                 console.error(error);
@@ -103,7 +74,7 @@ router.post("/update/", checkToken, async (req: CustomRequest, res: Response) =>
     });
 });
 
-// Delete Product
+// Delete attribute
 router.post("/delete/", checkToken, (req: CustomRequest, res: Response) => {
     const { id } = req.body;
     jwt.verify(req.token!, jwtKey!, async (err, authorizedData) => {
@@ -112,13 +83,13 @@ router.post("/delete/", checkToken, (req: CustomRequest, res: Response) => {
             res.status(403).json({ message: "Forbidden: No token provided" });
         } else {
             try {
-                const deletedProduct = await prisma.product.delete({
+                const deletedAttribute = await prisma.attribute.delete({
                     where: {
                         id: Number(id),
                     },
                 });
-                console.log(deletedProduct);
-                const successResponse = ApiResponse.success(deletedProduct);
+                console.log(deletedAttribute);
+                const successResponse = ApiResponse.success(deletedAttribute);
                 res.json(successResponse);
             } catch (error) {
                 console.error(error);
@@ -127,5 +98,6 @@ router.post("/delete/", checkToken, (req: CustomRequest, res: Response) => {
         }
     });
 });
+
 
 export default router; // Export the router

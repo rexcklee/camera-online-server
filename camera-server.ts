@@ -9,6 +9,8 @@ import categoryRoutes from './routes/category-routes';
 import userRoutes from './routes/user-routes';
 import subCategoryRoutes from './routes/subcategory-routes';
 import productRoutes from './routes/product-routes';
+import attributeRoutes from './routes/attribute-routes';
+import productAttributeRoutes from './routes/productAttribute-routes';
 
 const app = express();
 //const port = process.env.PORT || 3001;
@@ -31,8 +33,9 @@ app.use(express.json());
 app.use("/category", categoryRoutes);
 app.use("/subcategory", subCategoryRoutes);
 app.use("/product", productRoutes);
+app.use("/attribute", attributeRoutes);
+app.use("/productAttribute", productAttributeRoutes);
 app.use("/user", userRoutes);
-
 
 //Create an HTTPS server
 https.createServer(options, app).listen(445, () => {

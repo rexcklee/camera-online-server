@@ -12,7 +12,7 @@ const router = Router(); // Initialize Express Router
 const jwtKey = process.env.JWT_KEY;
 const saltRounds = 10;
 
-//Login user
+//Login admin user
 router.post("/login/", async (req, res) => {
     let token_expire_sec = 1800; // in second
 
@@ -26,34 +26,42 @@ router.post("/login/", async (req, res) => {
             },
         });
         console.log(user);
-        bcrypt
-            .compare(password, user!.password)
-            .then((bcryptres) => {
-                if (bcryptres) {
-                    jwt.sign(
-                        { user },
-                        process.env.JWT_KEY!,
-                        { expiresIn: token_expire_sec },
-                        (err, token) => {
-                            if (err) {
-                                console.log(err);
+        if (user?.isAdmin) {
+            bcrypt
+                .compare(password, user!.password)
+                .then((bcryptres) => {
+                    if (bcryptres) {
+                        jwt.sign(
+                            { user },
+                            process.env.JWT_KEY!,
+                            { expiresIn: token_expire_sec },
+                            (err, token) => {
+                                if (err) {
+                                    console.log(err);
+                                }
+                                const successResponse = ApiResponse.success({
+                                    token: token,
+                                    expire_in: token_expire_sec,
+                                    currentUser: user,
+                                });
+                                res.send(successResponse);
                             }
-                            const successResponse = ApiResponse.success({
-                                token: token,
-                                expire_in: token_expire_sec,
-                                currentUser: user,
-                            });
-                            res.send(successResponse);
-                        }
-                    );
-                } else {
-                    const errorResponse = ApiResponse.error(
-                        401,
-                        "ERROR: Could not log in"
-                    );
-                    res.send(errorResponse);
-                }
-            })
+                        );
+                    } else {
+                        const errorResponse = ApiResponse.error(
+                            401,
+                            "ERROR: Could not log in"
+                        );
+                        res.send(errorResponse);
+                    }
+                })
+        } else {
+            const errorResponse = ApiResponse.error(
+                401,
+                "ERROR: Could not log in as admin"
+            );
+            res.send(errorResponse);
+        }
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Internal Server Error' });

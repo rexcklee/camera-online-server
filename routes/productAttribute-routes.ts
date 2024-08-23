@@ -10,12 +10,12 @@ const prisma = new PrismaClient();
 const router = Router(); // Initialize Express Router
 const jwtKey = process.env.JWT_KEY;
 
-// Get All Products
+// Get All productAttributes
 router.get("/get_all/", async (req: Request, res: Response) => {
     try {
-        const allProducts = await prisma.product.findMany();
-        console.log(allProducts);
-        const successResponse = ApiResponse.success(allProducts);
+        const allProductAttribute = await prisma.productAttribute.findMany();
+        console.log(allProductAttribute);
+        const successResponse = ApiResponse.success(allProductAttribute);
         res.json(successResponse);
     } catch (error) {
         console.error(error);
@@ -23,17 +23,25 @@ router.get("/get_all/", async (req: Request, res: Response) => {
     }
 });
 
-// Get All Products
+// Get All Attributes by product ID
 router.post("/get_byId/", async (req: Request, res: Response) => {
-    const { id } = req.body;
-    console.log(id);
+    const { productId } = req.body;
+
     try {
-        const product = await prisma.product.findUnique({
-            where: { id: Number(id) },
+        const productAttributes = await prisma.productAttribute.findMany({
+            where: { productId: Number(productId) },
+            orderBy: [
+                {
+                    sort: 'asc',
+                },
+            ],
+            include: {
+                attribute: true,
+            },
         });
 
-        if (product) {
-            const successResponse = ApiResponse.success(product);
+        if (productAttributes) {
+            const successResponse = ApiResponse.success(productAttributes);
             res.json(successResponse);
         } else {
             res.status(404).json({ error: 'Product not found' });
@@ -44,26 +52,24 @@ router.post("/get_byId/", async (req: Request, res: Response) => {
     }
 });
 
-//Add Product
+//Add productAttribute
 router.post("/add/", checkToken, (req: CustomRequest, res: Response) => {
-    const { name, description, price, categoryId, subcategoryId } = req.body;
+    const { attributeId, productId, value } = req.body;
     jwt.verify(req.token!, jwtKey!, async (err, authorizedData) => {
         if (err) {
             console.log("ERROR: Could not connect to the protected route");
             res.status(403).json({ message: "Forbidden: No token provided" });
         } else {
             try {
-                const newProduct = await prisma.product.create({
+                const newProductAttribute = await prisma.productAttribute.create({
                     data: {
-                        name,
-                        description,
-                        price: Number(price),
-                        categoryId,
-                        subcategoryId,
+                        attributeId: Number(attributeId),
+                        productId: Number(productId),
+                        value: value,
                     },
                 });
-                console.log(newProduct);
-                const successResponse = ApiResponse.success(newProduct);
+                console.log(newProductAttribute);
+                const successResponse = ApiResponse.success(newProductAttribute);
                 res.json(successResponse);
             } catch (error) {
                 console.error(error);
@@ -73,27 +79,26 @@ router.post("/add/", checkToken, (req: CustomRequest, res: Response) => {
     });
 });
 
-// Update Product
+// Update productAttribute
 router.post("/update/", checkToken, async (req: CustomRequest, res: Response) => {
-    const { id, name, description, price, categoryId, subcategoryId } = req.body;
+    const { id, attributeId, productId, sort, value } = req.body;
     jwt.verify(req.token!, jwtKey!, async (err, authorizedData) => {
         if (err) {
             console.log("ERROR: Could not connect to the protected route");
             res.status(403).json({ message: "Forbidden: No token provided" });
         } else {
             try {
-                const updatedProduct = await prisma.product.update({
+                const updatedProductAttribute = await prisma.productAttribute.update({
                     where: { id: Number(id) },
                     data: {
-                        name,
-                        description,
-                        price,
-                        categoryId,
-                        subcategoryId
+                        attributeId,
+                        productId,
+                        sort,
+                        value,
                     },
                 });
-                console.log(updatedProduct);
-                const successResponse = ApiResponse.success(updatedProduct);
+                console.log(updatedProductAttribute);
+                const successResponse = ApiResponse.success(updatedProductAttribute);
                 res.json(successResponse);
             } catch (error) {
                 console.error(error);
@@ -103,7 +108,7 @@ router.post("/update/", checkToken, async (req: CustomRequest, res: Response) =>
     });
 });
 
-// Delete Product
+// Delete productAttribute
 router.post("/delete/", checkToken, (req: CustomRequest, res: Response) => {
     const { id } = req.body;
     jwt.verify(req.token!, jwtKey!, async (err, authorizedData) => {
@@ -112,13 +117,13 @@ router.post("/delete/", checkToken, (req: CustomRequest, res: Response) => {
             res.status(403).json({ message: "Forbidden: No token provided" });
         } else {
             try {
-                const deletedProduct = await prisma.product.delete({
+                const deletedProductAttribute = await prisma.productAttribute.delete({
                     where: {
                         id: Number(id),
                     },
                 });
-                console.log(deletedProduct);
-                const successResponse = ApiResponse.success(deletedProduct);
+                console.log(deletedProductAttribute);
+                const successResponse = ApiResponse.success(deletedProductAttribute);
                 res.json(successResponse);
             } catch (error) {
                 console.error(error);
