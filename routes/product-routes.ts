@@ -24,6 +24,40 @@ router.get("/get_all/", async (req: Request, res: Response) => {
 });
 
 // Get All Products
+router.post("/get_by_cat/", async (req: Request, res: Response) => {
+    const { selectedCat, selectedSubCat, searchText } = req.body;
+    try {
+        const whereClause: any = {};
+
+        if (selectedCat) {
+            whereClause.category = { name: { equals: selectedCat } };
+        }
+
+        if (selectedSubCat) {
+            whereClause.subcategory = { name: { equals: selectedSubCat } };
+        }
+
+        if (searchText) {
+            whereClause.OR = [
+                { name: { contains: searchText } },
+                { description: { contains: searchText } }
+            ];
+        }
+
+        const allProducts = await prisma.product.findMany({
+            where: whereClause,
+        });
+
+        console.log(allProducts);
+        const successResponse = ApiResponse.success(allProducts);
+        res.json(successResponse);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+// Get Products
 router.post("/get_byId/", async (req: Request, res: Response) => {
     const { id } = req.body;
     console.log(id);

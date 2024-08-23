@@ -35,6 +35,34 @@ router.get("/get_all/", async (req: Request, res: Response) => {
     }
 });
 
+// Get All sub-categories by category
+router.post("/get_by_cat/", async (req: Request, res: Response) => {
+    const { categoryName } = req.body;
+
+    try {
+        const allSubCategoriesByCat = await prisma.subCategory.findMany({
+            where: categoryName? { category: { name: { equals: categoryName } } }:undefined,
+            orderBy: [
+                {
+                    categoryId: 'asc',
+                },
+                {
+                    sort: 'asc',
+                },
+            ],
+            include: {
+                category: true,
+            },
+        });
+        console.log(allSubCategoriesByCat);
+        const successResponse = ApiResponse.success(allSubCategoriesByCat);
+        res.json(successResponse);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
 //Add product sub-category
 router.post("/add/", checkToken, (req: CustomRequest, res: Response) => {
     const { name, description, categoryId } = req.body;
